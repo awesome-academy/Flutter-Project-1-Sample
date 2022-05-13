@@ -18,6 +18,15 @@ class ConvertCoinSuccess extends ConvertCoinState {
   List<Object?> get props => [data];
 }
 
+class ChangeColorSuccess extends ConvertCoinState {
+  final dynamic data;
+
+  ChangeColorSuccess({required this.data});
+
+  @override
+  List<Object?> get props => [data];
+}
+
 class ConvertCoinLoadFailed extends ConvertCoinState {
   final dynamic error;
 

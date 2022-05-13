@@ -27,20 +27,13 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
   int currentIndex1 = 0;
   int currentIndex2 = 1;
   String? image;
-  ConvertCoinBloc? coinBloc;
   String numberBeforeConvert = "0.0";
 
   _ConvertCoinPageState({required this.coins});
 
-  void initBloc() async {
-    coinBloc = ConvertCoinBloc(
-        convertCoinRepository: getIt.get<ConvertCoinRepository>());
-  }
-
   @override
   void initState() {
     super.initState();
-    initBloc();
     coin = coins[0];
     for (ItemCoin coin in coins) {
       if (coin.symbol == convertedSymbol) {
@@ -52,7 +45,8 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => coinBloc!,
+      create: (context) => ConvertCoinBloc(
+          convertCoinRepository: getIt.get<ConvertCoinRepository>()),
       child: Scaffold(
         appBar: AppBar(
             elevation: 0,
@@ -75,36 +69,42 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
               child: GestureDetector(
                 child: BlocBuilder<ConvertCoinBloc, ConvertCoinState>(
                   builder: (context, state) {
-                    if (state is ConvertCoinSuccess) {
+                    if (state is ChangeColorSuccess) {
                       return Container(
-                          color: (state.data as List<Color>).first, child: originalCurrencyView());
+                          color: (state.data as List<Color>)[1],
+                          child: originalCurrencyView(context));
                     }
                     return Container(
-                        color: coinBloc?.originalCoinColor,
-                        child: originalCurrencyView());
+                        color: BlocProvider.of<ConvertCoinBloc>(context)
+                            .originalCoinColor,
+                        child: originalCurrencyView(context));
                   },
                 ),
                 onTap: () {
-                  coinBloc?.add(ChangeColorOfCoinField(
-                      AppColors.colorMystic, Colors.white));
+                  BlocProvider.of<ConvertCoinBloc>(context).add(
+                      ChangeColorOfCoinField(
+                          Colors.white, AppColors.colorMystic));
                 },
               ),
             ),
             GestureDetector(
               child: BlocBuilder<ConvertCoinBloc, ConvertCoinState>(
                 builder: (context, state) {
-                  if (state is ConvertCoinSuccess) {
+                  if (state is ChangeColorSuccess) {
                     return Container(
-                        color: (state.data as List<Color>)[1], child: originalCurrencyView());
+                        color: (state.data as List<Color>).first,
+                        child: convertedCurrencyView(context));
                   }
                   return Container(
-                      color: coinBloc?.convertedCoinColor,
-                      child: originalCurrencyView());
+                      color: BlocProvider.of<ConvertCoinBloc>(context)
+                          .convertedCoinColor,
+                      child: convertedCurrencyView(context));
                 },
               ),
               onTap: () {
-                coinBloc?.add(ChangeColorOfCoinField(
-                    AppColors.colorMystic, Colors.white));
+                BlocProvider.of<ConvertCoinBloc>(context).add(
+                    ChangeColorOfCoinField(
+                        AppColors.colorMystic, Colors.white));
               },
             )
           ],
@@ -153,7 +153,7 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
     });
   }
 
-  Widget originalCurrencyView() {
+  Widget originalCurrencyView(BuildContext blocContext) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -184,8 +184,9 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
                         coins[i].symbol, i == currentIndex1 ? true : false));
                   }
                   showCurrenciesDialog(symbols, false);
-                  coinBloc?.add(ChangeColorOfCoinField(
-                      AppColors.colorMystic, Colors.white));
+                  BlocProvider.of<ConvertCoinBloc>(blocContext).add(
+                      ChangeColorOfCoinField(
+                          Colors.white, AppColors.colorMystic));
                 },
               ),
               Padding(
@@ -223,8 +224,8 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
                         numberBeforeConvert = text.contains(AppStrings.COMMA)
                             ? text.replaceAll(AppStrings.COMMA, AppStrings.DOT)
                             : text;
-                        coinBloc
-                            ?.add(ConvertCoinLoaded(coin!.id, convertedSymbol));
+                        BlocProvider.of<ConvertCoinBloc>(blocContext)
+                            .add(ConvertCoinLoaded(coin!.id, convertedSymbol));
                       }
                     },
                   ),
@@ -239,7 +240,7 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
     );
   }
 
-  Widget convertedCurrencyView() {
+  Widget convertedCurrencyView(BuildContext blocContext) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -265,8 +266,9 @@ class _ConvertCoinPageState extends State<ConvertCoinPage> {
                 ),
                 onTap: () {
                   showCurrenciesDialog([], true);
-                  coinBloc?.add(ChangeColorOfCoinField(
-                      AppColors.colorMystic, Colors.white));
+                  BlocProvider.of<ConvertCoinBloc>(blocContext).add(
+                      ChangeColorOfCoinField(
+                          AppColors.colorMystic, Colors.white));
                 },
               ),
               Padding(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'package:vn_crypto/bloc/theme/theme_bloc.dart';
 import 'package:vn_crypto/bloc/theme/theme_state.dart';
 import 'package:vn_crypto/di/dependency_injection.dart';
@@ -12,7 +13,10 @@ import 'package:vn_crypto/ui/screen/about_app_screen.dart';
 
 void main() async {
   await configureInjection();
-  runApp(const MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (_) => IndexNavigation(0),
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -42,15 +46,24 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+class IndexNavigation with ChangeNotifier {
+  int selectedIndex;
 
+  IndexNavigation(this.selectedIndex);
+
+  void setIndex(int index) {
+    selectedIndex = index;
+    notifyListeners();
+  }
+}
+
+class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
           body: IndexedStack(
-            index: _selectedIndex,
+            index: Provider.of<IndexNavigation>(context).selectedIndex,
             children: const [
               HomePage(),
               ListCoinScreen(),
@@ -60,11 +73,9 @@ class _MainScreenState extends State<MainScreen> {
           ),
           bottomNavigationBar: BottomNav(
             onTap: (int i) {
-              setState(() {
-                _selectedIndex = i;
-              });
+              Provider.of<IndexNavigation>(context, listen: false).setIndex(i);
             },
-            selectedIndex: _selectedIndex,
+            selectedIndex: Provider.of<IndexNavigation>(context).selectedIndex,
           )),
       onGenerateRoute: appRoutes,
     );
