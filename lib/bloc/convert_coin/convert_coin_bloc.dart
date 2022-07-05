@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vn_crypto/bloc/convert_coin/convert_coin_event.dart';
 import 'package:vn_crypto/bloc/convert_coin/convert_coin_state.dart';
@@ -24,9 +23,7 @@ class ConvertCoinBloc extends Bloc<ConvertCoinEvent, ConvertCoinState> {
       ConvertCoinEvent event, Emitter<ConvertCoinState> emitter) {
     Color originalColor = (event as ChangeColorOfCoinField).originalColor;
     Color convertedColor = event.convertedColor;
-    print('state: ' + originalColor.value.toString());
-    print('state: ' + convertedColor.value.toString());
-    emitter(ConvertCoinSuccess(data: [originalColor , convertedColor]));
+    emitter(ChangeColorSuccess(data: [originalColor, convertedColor]));
   }
 
   void _onGetSupportedCurrenciesData() async {

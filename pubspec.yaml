@@ -38,6 +38,7 @@ dependencies:
   flutter_bloc: ^8.0.0
   equatable: ^2.0.3
   interactive_chart: ^0.3.4
+  provider: ^6.0.0
   dio: ^4.0.4
   get_it: ^7.2.0
   flutter_dotenv: ^5.0.0
